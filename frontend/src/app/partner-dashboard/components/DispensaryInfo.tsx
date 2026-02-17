@@ -435,6 +435,19 @@ function DispensaryCard({
           </ul>
         </div>
       )}
+      {/* Weekly Promotions */}
+      {dispensary.weeklyPromotions && Object.keys(dispensary.weeklyPromotions).length > 0 && (
+        <div className="mb-4 min-w-0">
+          <strong className="font-semibold text-gray-700 text-xs sm:text-sm">Weekly Promotions:</strong>
+          <ul className="list-none text-gray-600 text-xs mt-1 max-h-28 overflow-auto break-words">
+            {Object.entries(dispensary.weeklyPromotions).map(([day, promo]) => (
+              <li key={day} className="break-words">
+                <span className="capitalize font-semibold">{day}:</span> <span className="break-words">{promo}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
       <div className="mt-auto pt-4">
         {!dispensary.isPurchased && (
           <button onClick={handlePurchaseSubscription} className="w-full bg-orange-600 hover:bg-orange-700 text-white font-semibold px-4 py-2 rounded-lg shadow-md transition focus:outline-none focus:ring-2 focus:ring-orange-400">Purchase Subscription</button>
