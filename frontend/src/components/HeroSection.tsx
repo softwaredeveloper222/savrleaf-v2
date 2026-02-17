@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Image from 'next/image';
-import { Search, Check, Star } from 'lucide-react';
+import { Search, Check, Star, ChevronDown } from 'lucide-react';
 import logo from '../assets/logo.png';
 import backgroundImage from '../assets/background.png';
 import MapPinIcon from './MapPinIcon';
@@ -163,6 +163,18 @@ export default function HeroSection({
             </div>
           </div>
         </div>
+
+        {/* Browse deals arrow */}
+        <button
+          onClick={() => {
+            document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' });
+          }}
+          className="mt-10 inline-flex flex-col items-center gap-1 text-gray-600 hover:text-orange-600 transition-colors group cursor-pointer bg-transparent border-none"
+          aria-label="Scroll to deals"
+        >
+          <span className="text-sm font-medium">Browse deals below</span>
+          <ChevronDown className="h-5 w-5 animate-bounce" />
+        </button>
       </div>
     </section>
   );
