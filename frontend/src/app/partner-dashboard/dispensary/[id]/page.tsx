@@ -397,6 +397,21 @@ function DispensaryDetailsContent() {
                 </div>
               )}
 
+              {/* Weekly Promotions */}
+              {dispensary.weeklyPromotions && Object.keys(dispensary.weeklyPromotions).length > 0 && (
+                <div>
+                  <h3 className="font-semibold text-gray-800 mb-2">Weekly Promotions</h3>
+                  <div className="grid grid-cols-2 gap-2 text-sm">
+                    {Object.entries(dispensary.weeklyPromotions).map(([day, promo]) => (
+                      <div key={day} className="flex justify-between">
+                        <span className="font-medium text-gray-700 capitalize">{day}:</span>
+                        <span className="text-gray-600">{promo}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* SKU Information */}
               <div className="mt-4 p-4 bg-gray-50 rounded-lg">
                 <div className="flex items-center justify-between">
