@@ -66,6 +66,10 @@ const DispensarySchema = new Schema(
       type: Map,
       of: String,
     },
+    weeklyPromotions: {
+      type: Map,
+      of: String,
+    },
     description: {
       type: String,
     },

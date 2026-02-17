@@ -54,6 +54,16 @@ export default function DispensaryForm({ initialData, onSave, onCancel, userIdOv
     sunday: '',
   });
 
+  const [promotionsForm, setPromotionsForm] = useState({
+    monday: '',
+    tuesday: '',
+    wednesday: '',
+    thursday: '',
+    friday: '',
+    saturday: '',
+    sunday: '',
+  });
+
   const [formError, setFormError] = useState('');
 
   useEffect(() => {
@@ -97,6 +107,18 @@ export default function DispensaryForm({ initialData, onSave, onCancel, userIdOv
           sunday: initialData.hours.sunday || '',
         });
       }
+
+      if (initialData.weeklyPromotions) {
+        setPromotionsForm({
+          monday: initialData.weeklyPromotions.monday || '',
+          tuesday: initialData.weeklyPromotions.tuesday || '',
+          wednesday: initialData.weeklyPromotions.wednesday || '',
+          thursday: initialData.weeklyPromotions.thursday || '',
+          friday: initialData.weeklyPromotions.friday || '',
+          saturday: initialData.weeklyPromotions.saturday || '',
+          sunday: initialData.weeklyPromotions.sunday || '',
+        });
+      }
     }
   }, [initialData]);
 
@@ -125,6 +147,14 @@ export default function DispensaryForm({ initialData, onSave, onCancel, userIdOv
   const handleHoursChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setHoursForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handlePromotionsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setPromotionsForm((prev) => ({
       ...prev,
       [name]: value,
     }));
@@ -270,6 +300,14 @@ export default function DispensaryForm({ initialData, onSave, onCancel, userIdOv
       }
     });
 
+    // Build weeklyPromotions object (only include non-empty values)
+    const weeklyPromotions: Record<string, string> = {};
+    Object.entries(promotionsForm).forEach(([day, text]) => {
+      if (text.trim()) {
+        weeklyPromotions[day] = text.trim();
+      }
+    });
+
     // Combine uploaded images with manually entered URLs
     const manualUrls = form.images.split(',').map((i) => i.trim()).filter(Boolean);
     const allImages = [...uploadedImages, ...manualUrls.filter(url => !uploadedImages.includes(url))];
@@ -286,6 +324,7 @@ export default function DispensaryForm({ initialData, onSave, onCancel, userIdOv
       logo: uploadedLogo || form.logo || undefined,
       images: allImages,
       hours: Object.keys(hours).length > 0 ? hours : undefined,
+      weeklyPromotions: Object.keys(weeklyPromotions).length > 0 ? weeklyPromotions : {},
       accessType: form.accessType,
       // Allow admins to create a dispensary on behalf of a partner
       ...(userIdOverride ? { userId: userIdOverride } : {}),
@@ -437,6 +476,26 @@ export default function DispensaryForm({ initialData, onSave, onCancel, userIdOv
                 value={hoursForm[day as keyof typeof hoursForm]}
                 onChange={handleHoursChange}
                 placeholder="e.g., 9:00 AM - 5:00 PM"
+                className="flex-1 border border-gray-300 focus:border-orange-500 focus:ring focus:ring-orange-200 p-2 rounded-lg"
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Weekly Promotions */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">Weekly Promotions (optional)</label>
+        <p className="text-xs text-gray-500 mb-2">Add daily specials or recurring promotions for each day of the week.</p>
+        <div className="space-y-2">
+          {['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'].map((day) => (
+            <div key={day} className="flex items-center gap-2">
+              <label className="w-24 text-sm capitalize">{day}:</label>
+              <input
+                name={day}
+                value={promotionsForm[day as keyof typeof promotionsForm]}
+                onChange={handlePromotionsChange}
+                placeholder="e.g., 20% off all edibles"
                 className="flex-1 border border-gray-300 focus:border-orange-500 focus:ring focus:ring-orange-200 p-2 rounded-lg"
               />
             </div>
