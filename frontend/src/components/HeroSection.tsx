@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Image from 'next/image';
-import { Search, Check, Star } from 'lucide-react';
+import { Search, Check, Star, ChevronDown } from 'lucide-react';
 import logo from '../assets/logo.png';
 import backgroundImage from '../assets/background.png';
 import MapPinIcon from './MapPinIcon';
@@ -162,6 +162,20 @@ export default function HeroSection({
               <span>Enter ZIP code or use your location</span>
             </div>
           </div>
+        </div>
+
+        {/* Browse deals arrow */}
+        <div className="flex justify-end mt-10 max-w-4xl mx-auto">
+          <button
+            onClick={() => {
+              document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' });
+            }}
+            className="inline-flex flex-col items-center gap-1 text-gray-800 hover:text-orange-600 transition-colors cursor-pointer bg-white/60 backdrop-blur-sm border border-gray-200 rounded-xl px-5 py-3 shadow-sm hover:shadow-md"
+            aria-label="Scroll to deals"
+          >
+            <span className="text-sm font-semibold">Browse deals below</span>
+            <ChevronDown className="h-5 w-5 animate-bounce" />
+          </button>
         </div>
       </div>
     </section>
