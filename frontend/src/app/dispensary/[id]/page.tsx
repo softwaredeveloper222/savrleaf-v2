@@ -9,6 +9,7 @@ import { Deal, Dispensary } from '@/types';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import DealCard from '@/components/DealCard';
+import WeeklyPromotions from '@/components/WeeklyPromotions';
 import defaultDispensaryImg from '@/assets/dispensary.jpg';
 
 export default function DispensaryDetailPage() {
@@ -228,6 +229,13 @@ export default function DispensaryDetailPage() {
               </div>
             </div>
           </div>
+
+          {/* Weekly Promotions - only for purchased dispensaries with promotions */}
+          {dispensary.isPurchased &&
+            dispensary.weeklyPromotions &&
+            Object.values(dispensary.weeklyPromotions).some((v) => v && v.trim() !== '') && (
+              <WeeklyPromotions weeklyPromotions={dispensary.weeklyPromotions} />
+          )}
 
           {/* Deals Section - only shown when showDeals=true */}
           {showDeals && (
