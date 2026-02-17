@@ -165,7 +165,7 @@ export default function HeroSection({
         </div>
 
         {/* Browse deals arrow */}
-        <div className="flex justify-end mt-10 max-w-4xl mx-auto">
+        <div className="flex justify-center mt-10 max-w-4xl mx-auto">
           <button
             onClick={() => {
               document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' });
