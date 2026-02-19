@@ -412,6 +412,14 @@ function DispensaryDetailsContent() {
                 </div>
               )}
 
+              {/* Accessories & Merch */}
+              {dispensary.accessoriesMerch && dispensary.accessoriesMerch.trim() !== '' && (
+                <div>
+                  <h3 className="font-semibold text-gray-800 mb-2">Accessories & Merch</h3>
+                  <p className="text-sm text-gray-600 whitespace-pre-line">{dispensary.accessoriesMerch}</p>
+                </div>
+              )}
+
               {/* SKU Information */}
               <div className="mt-4 p-4 bg-gray-50 rounded-lg">
                 <div className="flex items-center justify-between">

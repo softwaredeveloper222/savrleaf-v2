@@ -448,6 +448,13 @@ function DispensaryCard({
           </ul>
         </div>
       )}
+      {/* Accessories & Merch */}
+      {dispensary.accessoriesMerch && dispensary.accessoriesMerch.trim() !== '' && (
+        <div className="mb-4 min-w-0">
+          <strong className="font-semibold text-gray-700 text-xs sm:text-sm">Accessories & Merch:</strong>
+          <p className="text-gray-600 text-xs mt-1 whitespace-pre-line break-words">{dispensary.accessoriesMerch}</p>
+        </div>
+      )}
       <div className="mt-auto pt-4">
         {!dispensary.isPurchased && (
           <button onClick={handlePurchaseSubscription} className="w-full bg-orange-600 hover:bg-orange-700 text-white font-semibold px-4 py-2 rounded-lg shadow-md transition focus:outline-none focus:ring-2 focus:ring-orange-400">Purchase Subscription</button>

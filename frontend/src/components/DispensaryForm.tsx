@@ -35,6 +35,7 @@ export default function DispensaryForm({ initialData, onSave, onCancel, userIdOv
     images: '', // comma-separated URLs
     hours: {} as Record<string, string>,
     accessType: 'medical' as 'medical' | 'recreational' | 'medical/recreational',
+    accessoriesMerch: '',
   });
 
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
@@ -89,6 +90,7 @@ export default function DispensaryForm({ initialData, onSave, onCancel, userIdOv
         images: imageUrls.join(', '),
         hours: initialData.hours || {},
         accessType: initialData.accessType || 'medical',
+        accessoriesMerch: initialData.accessoriesMerch || '',
       });
 
       setUploadedImages(imageUrls);
@@ -325,6 +327,7 @@ export default function DispensaryForm({ initialData, onSave, onCancel, userIdOv
       images: allImages,
       hours: Object.keys(hours).length > 0 ? hours : undefined,
       weeklyPromotions: Object.keys(weeklyPromotions).length > 0 ? weeklyPromotions : {},
+      accessoriesMerch: form.accessoriesMerch.trim() || '',
       accessType: form.accessType,
       // Allow admins to create a dispensary on behalf of a partner
       ...(userIdOverride ? { userId: userIdOverride } : {}),
@@ -501,6 +504,20 @@ export default function DispensaryForm({ initialData, onSave, onCancel, userIdOv
             </div>
           ))}
         </div>
+      </div>
+
+      {/* Accessories & Merch */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">Accessories & Merch (optional)</label>
+        <p className="text-xs text-gray-500 mb-2">Highlight discounted non-cannabis items like rolling papers, apparel, glassware, etc. This does not count toward your deal/SKU limit.</p>
+        <textarea
+          name="accessoriesMerch"
+          value={form.accessoriesMerch}
+          onChange={handleChange}
+          placeholder="e.g., 20% off all rolling papers this week&#10;Buy 2 get 1 free on branded apparel&#10;New glassware arrivals — 15% off"
+          className="border border-gray-300 focus:border-orange-500 focus:ring focus:ring-orange-200 p-2 w-full rounded-lg"
+          rows={4}
+        />
       </div>
 
       {/* Access Type */}

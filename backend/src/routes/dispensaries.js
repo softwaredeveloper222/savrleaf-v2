@@ -279,6 +279,7 @@ router.put('/:id', authMiddleware, async (req, res) => {
       images,
       accessType,
       weeklyPromotions,
+      accessoriesMerch,
     } = req.body;
 
     const dispensary = await Dispensary.findById(id);
@@ -305,6 +306,7 @@ router.put('/:id', authMiddleware, async (req, res) => {
     if (images !== undefined) dispensary.images = ensureDispensaryHasImages(images);
     if (accessType !== undefined) dispensary.accessType = accessType;
     if (weeklyPromotions !== undefined) dispensary.weeklyPromotions = weeklyPromotions;
+    if (accessoriesMerch !== undefined) dispensary.accessoriesMerch = accessoriesMerch;
 
     await dispensary.save();
 
