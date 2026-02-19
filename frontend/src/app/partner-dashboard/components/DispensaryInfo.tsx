@@ -222,6 +222,17 @@ function DispensaryCard({
           ) : (
             <span className="text-xs text-red-500 bg-red-100 text-red-700 px-2 py-1 rounded-full whitespace-nowrap">Inactive</span>
           )}
+          {/* Hint to add promotions/merch if empty */}
+          {dispensary.isPurchased &&
+            (!dispensary.weeklyPromotions || Object.keys(dispensary.weeklyPromotions).length === 0) &&
+            (!dispensary.accessoriesMerch || dispensary.accessoriesMerch.trim() === '') && (
+              <span className="text-orange-500 text-[10px] whitespace-nowrap flex items-center gap-1">
+                Add Promos & Merch
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 animate-bounce-x" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+              </span>
+          )}
           <button
             onClick={() => onEdit(dispensary)}
             className="text-orange-600 hover:text-orange-700 p-1 rounded transition"
@@ -454,17 +465,6 @@ function DispensaryCard({
           <strong className="font-semibold text-gray-700 text-xs sm:text-sm">Accessories & Merch:</strong>
           <p className="text-gray-600 text-xs mt-1 whitespace-pre-line break-words">{dispensary.accessoriesMerch}</p>
         </div>
-      )}
-      {/* Hint to add promotions/merch if empty */}
-      {dispensary.isPurchased &&
-        (!dispensary.weeklyPromotions || Object.keys(dispensary.weeklyPromotions).length === 0) &&
-        (!dispensary.accessoriesMerch || dispensary.accessoriesMerch.trim() === '') && (
-          <div className="mb-4 flex items-center gap-2 text-orange-500 text-xs">
-            <span>Add Weekly Promotions or Accessories & Merch</span>
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
-            </svg>
-          </div>
       )}
       <div className="mt-auto pt-4">
         {!dispensary.isPurchased && (
