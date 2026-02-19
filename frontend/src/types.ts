@@ -37,6 +37,7 @@ export interface Dispensary {
   phoneNumber?: string;
   hours?: Record<string, string>;
   weeklyPromotions?: Record<string, string>;
+  accessoriesMerch?: string;
   description?: string;
   amenities: string[];
   logo?: string;

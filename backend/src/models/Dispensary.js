@@ -70,6 +70,9 @@ const DispensarySchema = new Schema(
       type: Map,
       of: String,
     },
+    accessoriesMerch: {
+      type: String,
+    },
     description: {
       type: String,
     },

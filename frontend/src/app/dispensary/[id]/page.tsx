@@ -10,6 +10,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import DealCard from '@/components/DealCard';
 import WeeklyPromotions from '@/components/WeeklyPromotions';
+import AccessoriesMerch from '@/components/AccessoriesMerch';
 import defaultDispensaryImg from '@/assets/dispensary.jpg';
 
 export default function DispensaryDetailPage() {
@@ -235,6 +236,13 @@ export default function DispensaryDetailPage() {
             dispensary.weeklyPromotions &&
             Object.values(dispensary.weeklyPromotions).some((v) => v && v.trim() !== '') && (
               <WeeklyPromotions weeklyPromotions={dispensary.weeklyPromotions} />
+          )}
+
+          {/* Accessories & Merch - only for purchased dispensaries with content */}
+          {dispensary.isPurchased &&
+            dispensary.accessoriesMerch &&
+            dispensary.accessoriesMerch.trim() !== '' && (
+              <AccessoriesMerch text={dispensary.accessoriesMerch} />
           )}
 
           {/* Deals Section - only shown when showDeals=true */}
