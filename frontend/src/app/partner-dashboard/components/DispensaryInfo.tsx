@@ -455,6 +455,17 @@ function DispensaryCard({
           <p className="text-gray-600 text-xs mt-1 whitespace-pre-line break-words">{dispensary.accessoriesMerch}</p>
         </div>
       )}
+      {/* Hint to add promotions/merch if empty */}
+      {dispensary.isPurchased &&
+        (!dispensary.weeklyPromotions || Object.keys(dispensary.weeklyPromotions).length === 0) &&
+        (!dispensary.accessoriesMerch || dispensary.accessoriesMerch.trim() === '') && (
+          <div className="mb-4 flex items-center gap-2 text-orange-500 text-xs">
+            <span>Add Weekly Promotions or Accessories & Merch</span>
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
+            </svg>
+          </div>
+      )}
       <div className="mt-auto pt-4">
         {!dispensary.isPurchased && (
           <button onClick={handlePurchaseSubscription} className="w-full bg-orange-600 hover:bg-orange-700 text-white font-semibold px-4 py-2 rounded-lg shadow-md transition focus:outline-none focus:ring-2 focus:ring-orange-400">Purchase Subscription</button>
