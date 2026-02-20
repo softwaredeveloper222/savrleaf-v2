@@ -226,9 +226,9 @@ function DispensaryCard({
           {dispensary.isPurchased &&
             (!dispensary.weeklyPromotions || Object.keys(dispensary.weeklyPromotions).length === 0) &&
             (!dispensary.accessoriesMerch || dispensary.accessoriesMerch.trim() === '') && (
-              <span className="text-orange-500 text-[10px] whitespace-nowrap flex items-center gap-1">
+              <span className="text-gray-500 text-xs whitespace-nowrap flex items-center gap-1">
                 Add Promos & Merch
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 animate-bounce-x" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 animate-bounce-x" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                 </svg>
               </span>
