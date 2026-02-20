@@ -12,8 +12,6 @@ import DashboardLayout from '@/components/dashboard/DashboardLayout';
 import Modal from '@/components/Modal';
 import DealForm from '@/components/DealForm';
 
-
-
 function DispensaryDetailsContent() {
   const params = useParams();
   const router = useRouter();
