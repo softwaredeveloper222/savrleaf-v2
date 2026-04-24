@@ -11,53 +11,104 @@ export interface Coordinates {
   coordinates: [number, number]; // [longitude, latitude]
 }
 
+export interface GenericDispensary {
+  _id: string;
+  name: string;
+  address: Address;
+  coordinates?: Coordinates;
+  licenseNumber?: string;
+  websiteUrl?: string;
+  phoneNumber?: string;
+  email?: string;
+  description?: string;
+  amenities: string[];
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export interface Dispensary {
   _id: string;
   name: string;
-  type: string;
-  legalName: string;
+  legalName?: string;
   address: Address;
   coordinates: Coordinates;
   licenseNumber: string;
   websiteUrl?: string;
   phoneNumber?: string;
   hours?: Record<string, string>;
+  weeklyPromotions?: Record<string, string>;
+  accessoriesMerch?: string;
   description?: string;
   amenities: string[];
   logo?: string;
-  images: string[];
-  status: 'pending' | 'approved' | 'rejected';
+  images?: string[];
+  status?: 'pending' | 'approved' | 'rejected';
   application: string;
   user: string;
+  subPartnerEmail?: string;
+  subPartnerPassword?: string;
   subscription?: Subscription | null;
   adminNotes?: string;
-  ratings: number[];
+  ratings?: number[];
+  isActive?: boolean;
+  skuLimit: number;
+  isPurchased: boolean;
+  type: 'main' | 'additional';
+  usedSkus: number;
+  extraLimit: number;
+  additionalSkuLimit: number;
+  accessType?: 'medical' | 'recreational' | 'medical/recreational';
+  isArchived?: boolean;
   createdAt?: string;
   updatedAt?: string;
+  isGeneric?: boolean;
 }
 
 export interface Deal {
   _id: string;
-  title: string;
+  title?: string;
   brand?: string;
   tags: string[];
   description?: string;
-  originalPrice: number;
+  originalPrice?: number;
   salePrice: number;
   images: string[];
   dispensary: Dispensary | string;
-  startDate: string;
-  endDate: string;
-  accessType: 'medical' | 'recreational' | 'both';
+  startDate?: string;
+  endDate?: string;
   slug?: string;
   manuallyActivated: boolean;
-  category: 'flower' | 'edibles' | 'concentrates' | 'vapes' | 'topicals' | 'accessories' | 'other';
-  subcategory?: string;
-  strain?: string;
+  category?: 'flower' | 'edibles' | 'concentrates' | 'vapes' | 'topicals' | 'pre-roll' | 'tincture' | 'beverage' | 'capsule/pill' | 'other';
+  subcategory?: string; // For Flower: 'ground-flower', 'baby-buds-popcorn', or custom
+  descriptiveKeywords?: string[]; // e.g., 'relaxing', 'focused', 'uplifting', 'calming', etc.
+  strain?: "indica" | "indica-dominant hybrid" | "hybrid" | "sativa-dominant hybrid" | "sativa";
   thcContent?: number;
   cbdContent?: number;
+  deal_purchase_link?: string;
+  sizeOrStrength?: string;
+  isActive: boolean;
+  discountTier?: number;
+  discountPercent?: number | null;
+  estimatedOriginalPrice?: number | null;
+  estimatedSavings?: number | null;
+  active?: boolean;
   createdAt?: string;
   updatedAt?: string;
+}
+
+export interface TickerTopDeal {
+  title: string;
+  discountTier: number;
+  salePrice: number;
+  dispensaryName: string | null;
+}
+
+export interface TickerData {
+  totalSavings: number;
+  avgDiscount: number;
+  activeDeals: number;
+  maxDiscount: number;
+  topDeals: TickerTopDeal[];
 }
 
 export type SubscriptionTier = {
@@ -83,10 +134,12 @@ export interface User {
   email: string;
   role: 'partner' | 'admin';
   isActive: boolean;
+  allowMultipleLocations: boolean;
   dispensaries?: string[];
   subscription?: {
     _id: string;
     status: string;
+    additionalLocationsCount?: number;
     bonusSkus?: number;
     adminSkuOverride?: number | null;
     tier?: {
@@ -115,6 +168,7 @@ export interface Application {
   amenities: string[];
   status: 'pending' | 'approved' | 'rejected';
   adminNotes?: string;
+  isArchived?: boolean;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -134,7 +188,7 @@ export interface Subscription {
   dispensary: string;
   tier: SubscriptionTier;
   stripeSubscriptionId: string;
-  stripeCustomerId: string;
+  // stripeCustomerId: string;
   status: SubscriptionStatus;
   startDate?: string;
   endDate?: string;

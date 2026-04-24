@@ -47,7 +47,7 @@ export default function AdminTable<T extends { _id: string }>({
           <div
             key={item._id}
             onClick={() => onRowClick?.(item)}
-            className="bg-white shadow-md p-4 md:grid md:gap-4 hover:shadow-lg transition cursor-pointer"
+            className="bg-white shadow-md p-4 md:grid hover:shadow-lg transition cursor-pointer"
             style={{ gridTemplateColumns }}
           >
             {columns.map((col) => (
@@ -56,8 +56,10 @@ export default function AdminTable<T extends { _id: string }>({
                 <span className="text-gray-900">
                   {col.render
                     ? col.render(item)
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    : (item as any)[col.key as string] ?? ''}
+                    : col.key === 'createdAt' && (item as any)[col.key as string]
+                      ? new Date((item as any)[col.key as string]).toLocaleDateString()
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                      : (item as any)[col.key as string] ?? ''}
                 </span>
               </div>
             ))}

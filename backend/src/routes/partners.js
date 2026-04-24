@@ -2,6 +2,7 @@ import express from 'express';
 import User from '../models/User.js';
 import Deal from '../models/Deal.js';
 import Dispensary from '../models/Dispensary.js';
+import Application from '../models/Application.js';
 import authMiddleware from '../middleware/authMiddleware.js';
 
 const router = express.Router();
@@ -19,21 +20,30 @@ router.get('/dashboard', authMiddleware, async (req, res) => {
 
     if (!user) return res.status(404).json({ message: 'User not found' });
 
-    if (!user.isActive) {
+    if (!user.isActiveByLink) {
       return res.status(403).json({ message: 'User is deactivated. Contact support.' });
     }
 
-    // Get dispensaries owned by user
-    const dispensaries = await Dispensary.find({ user: userId }).lean();
+    const application = await Application.findOne({ user: userId }).lean();
+
+    //if application available then get all dispensaries from application
+    // else get all dispensaries from user
+    let dispensaries = [];
+    if (application) {
+      dispensaries = await Dispensary.find({ application: application._id }).lean();
+    } else {
+      dispensaries = await Dispensary.find({ user: userId }).lean();
+    }
+
     const dispensaryIds = dispensaries.map((d) => d._id);
 
     // Get deals for those dispensaries
-    const deals = await Deal.find({ dispensary: { $in: dispensaryIds } }).lean();
+    const deals = await Deal.find({ dispensary: { $in: dispensaryIds } }).populate('dispensary').lean();
 
     const totalDeals = deals.length;
     const totalDispensaries = dispensaries.length;
     const activeDeals = deals.filter(
-      (deal) => new Date(deal.startDate) <= new Date() && new Date(deal.endDate) >= new Date()
+      (deal) => new Date(deal.startDate) <= new Date() && new Date(deal.endDate) >= new Date() && deal.isActive
     ).length;
 
     // Subscription calculations
@@ -53,6 +63,7 @@ router.get('/dashboard', authMiddleware, async (req, res) => {
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
+        firstLogin: user.firstLogin,
         role: user.role,
         subscription,
         maxSKUs,
@@ -62,10 +73,10 @@ router.get('/dashboard', authMiddleware, async (req, res) => {
         totalDeals,
         totalDispensaries,
         activeDeals,
-        isUserActive: user.isActive,
+        isUserActive: user.isActiveByLink,
       },
       dispensaries,
-      deals,
+      deals
     });
   } catch (error) {
     console.error(error);

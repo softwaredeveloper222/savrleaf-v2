@@ -1,30 +1,40 @@
 'use client';
 
-import { useState } from 'react';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { Dispensary } from '@/types';
 import defaultDispensaryImg from '../assets/dispensary.jpg';
 
 export default function DispensaryCard({ dispensary }: { dispensary: Dispensary }) {
-  const [isOpen, setIsOpen] = useState(false);
-  const imageSrc = dispensary.images?.[0] || defaultDispensaryImg.src;
+  const router = useRouter();
+  // const imageSrc = dispensary.images?.[0] || defaultDispensaryImg.src;
+  const imageSrc = defaultDispensaryImg.src;
+
+  const handleCardClick = () => {
+    router.push(`/dispensary/${dispensary._id}`);
+  };
+
+  const handleViewDeals = () => {
+    router.push(`/dispensary/${dispensary._id}?showDeals=true`);
+  };
 
   return (
     <>
       {/* Card */}
       <div
-        onClick={() => setIsOpen(true)}
         className="cursor-pointer bg-gray-50 shadow-lg rounded-2xl p-4 transition-transform duration-300 hover:-translate-y-1 hover:shadow-xl min-h-[280px] w-full flex flex-col justify-between"
       >
-        <div>
+        <div onClick={handleCardClick}>
           {/* Logo and name */}
           <div className="flex items-center mb-4 gap-3">
             {dispensary.logo ? (
               <div className="h-12 w-12 rounded-full overflow-hidden flex-shrink-0">
-                <img
+                <Image
                   src={dispensary.logo}
                   alt={`${dispensary.name} logo`}
+                  width={48}
+                  height={48}
                   className="h-full w-full object-contain"
-                  loading="lazy"
                 />
               </div>
             ) : (
@@ -32,16 +42,24 @@ export default function DispensaryCard({ dispensary }: { dispensary: Dispensary 
                 No Logo
               </div>
             )}
-            <h3 className="text-lg font-bold">{dispensary.name}</h3>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h3 className="text-lg font-bold">{dispensary.name}</h3>
+                {(dispensary as { isGeneric?: boolean }).isGeneric && (
+                  <span className="px-2 py-0.5 text-[10px] font-semibold bg-slate-200 text-slate-700 rounded">Generic</span>
+                )}
+              </div>
+            </div>
           </div>
 
           {/* Large image */}
           <div className="h-40 w-full rounded-xl overflow-hidden mb-4">
-            <img
+            <Image
               src={imageSrc}
               alt={dispensary.name}
+              width={400}
+              height={160}
               className="h-full w-full object-cover"
-              loading="lazy"
             />
           </div>
 
@@ -54,59 +72,28 @@ export default function DispensaryCard({ dispensary }: { dispensary: Dispensary 
         </div>
 
         <div className="text-xs text-gray-400 mt-4">
-          License: {dispensary.licenseNumber}
+          License: {dispensary.licenseNumber || 'N/A'}
         </div>
-      </div>
-
-      {/* Modal */}
-      {isOpen && (
-        <div
-          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
-          onClick={() => setIsOpen(false)}
-        >
-          <div
-            className="bg-white rounded-2xl max-w-3xl w-full p-6 relative"
-            onClick={(e) => e.stopPropagation()}
+        <br/>
+        <div className="flex justify-center space-x-4 mb-2">
+          <button
+            className="px-6 py-2 rounded-full text-sm font-semibold transition cursor-pointer bg-orange-600 text-white shadow-md"
+            onClick={() => {
+              if (dispensary.type) {
+                handleViewDeals();
+              } else {
+                const destination = dispensary.address.street1
+                  ? `${dispensary.address.street1}, ${dispensary.address.city}, ${dispensary.address.state} ${dispensary.address.zipCode || ''}`
+                  : `${dispensary.address.city}, ${dispensary.address.state}`;
+                window.open(`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(destination)}`, '_blank');
+              }
+            }}
           >
-            <button
-              onClick={() => setIsOpen(false)}
-              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-xl font-bold"
-            >
-              &times;
-            </button>
-
-            <div className="flex flex-col md:flex-row gap-6">
-              <div className="flex-shrink-0 w-full md:w-1/2 h-64 md:h-auto rounded-xl overflow-hidden">
-                <img
-                  src={imageSrc}
-                  alt={dispensary.name}
-                  className="w-full h-full object-cover"
-                  loading="lazy"
-                />
-              </div>
-              <div className="flex-1 flex flex-col gap-2">
-                <p className="text-gray-600">
-                  {dispensary.type ?"":"Nutural / Basic"}
-                </p>
-                <h2 className="text-2xl font-bold">{dispensary.name}</h2>
-                {dispensary.legalName && <p className="text-gray-600">Legal Name: {dispensary.legalName}</p>}
-                <p className="text-gray-600">
-                  Address: {dispensary.address.street1} {dispensary.address.street2 && `, ${dispensary.address.street2}`}, {dispensary.address.city}, {dispensary.address.state} {dispensary.address.zipCode}
-                </p>
-                {dispensary.phoneNumber && <p className="text-gray-600">Phone: {dispensary.phoneNumber}</p>}
-                {dispensary.websiteUrl && <p className="text-gray-600">Website: <a href={dispensary.type ? dispensary.websiteUrl : `https://www.google.com/maps/@${dispensary.coordinates.coordinates[0]},${dispensary.coordinates.coordinates[1]}`} target="_blank" className="text-orange-600 underline">{dispensary.websiteUrl}</a></p>}
-                <p className="text-gray-600">{dispensary.description || 'No description available.'}</p>
-                {dispensary.amenities.length > 0 && (
-                  <p className="text-gray-600">Amenities: {dispensary.amenities.join(', ')}</p>
-                )}
-                <div className="mt-auto text-xs text-gray-400">
-                  License: {dispensary.licenseNumber}
-                </div>
-              </div>
-            </div>
-          </div>
+            {dispensary.type ? 'View Discounts' : 'Get Directions'}
+          </button>
         </div>
-      )}
+
+      </div>
     </>
   );
 }

@@ -1,10 +1,11 @@
 'use client';
 
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import axios, { AxiosError } from 'axios';
 import { useState } from 'react';
 import { SubscriptionTier } from '@/types';
 import { amenitiesOptions } from '@/constants/amenities';
+import AddressAutocomplete from './AddressAutocomplete';
 
 type DispensaryApplicationFormProps = {
   selectedTier: SubscriptionTier | null;
@@ -30,11 +31,24 @@ type ApplicationFormData = {
   description?: string;
   amenities: string[];
   subscriptionTier: string;
+  additionalLocationsCount: number;
+  accessType: 'medical' | 'recreational' | 'medical/recreational';
 };
 
-export default function DispensaryApplicationForm({ selectedTier }: DispensaryApplicationFormProps) {
-  const { register, handleSubmit, formState: { errors, isSubmitting }, reset } = useForm<ApplicationFormData>({
-    defaultValues: { amenities: [] }
+export default function DispensaryApplicationForm() {
+  const { register, handleSubmit, formState: { errors, isSubmitting }, reset, control } = useForm<ApplicationFormData>({
+    defaultValues: { 
+      amenities: [],
+      address: {
+        street1: '',
+        street2: '',
+        city: '',
+        state: '',
+        zipCode: '',
+      },
+      additionalLocationsCount: 0,
+      accessType: 'medical',
+    }
   });
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -45,16 +59,17 @@ export default function DispensaryApplicationForm({ selectedTier }: DispensaryAp
     setErrorMessage(null);
     setSuccessMessage(null);
 
-    if (!selectedTier) {
-      setErrorMessage('Please select a subscription tier');
-      return;
-    }
-
     try {
+      const subscriptionTiers = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/subscription-tiers`);
+      if (subscriptionTiers.status !== 200) {
+        setErrorMessage('Failed to fetch subscription tier.');
+        return;
+      }
+      const subscriptionTier = subscriptionTiers.data.find((tier: SubscriptionTier) => tier.name === 'main_location');
       // 1️⃣ Submit application
       const appResp = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/applications`, {
         ...data,
-        subscriptionTier: selectedTier._id
+        subscriptionTier: subscriptionTier._id
       });
       const subscriptionId = appResp.data.subscriptionId;
 
@@ -77,31 +92,31 @@ export default function DispensaryApplicationForm({ selectedTier }: DispensaryAp
     }
   }
 
-  if (submittedData) {
-    return (
-      <div className="max-w-4xl mx-auto p-8 bg-white rounded shadow border border-orange-100">
-        <h2 className="text-3xl font-semibold text-orange-600 mb-4">Thank you for your application!</h2>
-        <p className="mb-6 text-gray-700">
-          You will be notified when your application is approved so you can make your payment and access your dashboard.
-        </p>
+  // if (submittedData) {
+  //   return (
+  //     <div className="max-w-4xl mx-auto p-8 bg-white rounded shadow border border-orange-100">
+  //       <h2 className="text-3xl font-semibold text-orange-600 mb-4">Thank you for your application!</h2>
+  //       <p className="mb-6 text-gray-700">
+  //         You will be notified when your application is approved so you can make your payment and access your dashboard.
+  //       </p>
 
-        <h3 className="text-xl font-semibold mb-2">Submission Summary:</h3>
-        <div className="space-y-3 text-gray-800">
-          <p><strong>Name:</strong> {submittedData.firstName} {submittedData.lastName}</p>
-          <p><strong>Email:</strong> {submittedData.email}</p>
-          <p><strong>Dispensary Name:</strong> {submittedData.dispensaryName}</p>
-          <p><strong>Legal Name:</strong> {submittedData.legalName}</p>
-          <p><strong>License Number:</strong> {submittedData.licenseNumber}</p>
-          <p><strong>Phone Number:</strong> {submittedData.phoneNumber || 'N/A'}</p>
-          <p><strong>Website URL:</strong> {submittedData.websiteUrl || 'N/A'}</p>
-          <p><strong>Description:</strong> {submittedData.description || 'N/A'}</p>
-          <p><strong>Address:</strong> {`${submittedData.address.street1}${submittedData.address.street2 ? ', ' + submittedData.address.street2 : ''}, ${submittedData.address.city}, ${submittedData.address.state} ${submittedData.address.zipCode}`}</p>
-          <p><strong>Amenities:</strong> {submittedData.amenities.length ? submittedData.amenities.join(', ') : 'None'}</p>
-          <p><strong>Subscription Tier:</strong> {selectedTier?.displayName}</p>
-        </div>
-      </div>
-    );
-  }
+  //       <h3 className="text-xl font-semibold mb-2">Submission Summary:</h3>
+  //       <div className="space-y-3 text-gray-800">
+  //         <p><strong>Name:</strong> {submittedData.firstName} {submittedData.lastName}</p>
+  //         <p><strong>Email:</strong> {submittedData.email}</p>
+  //         <p><strong>Dispensary Name:</strong> {submittedData.dispensaryName}</p>
+  //         <p><strong>Legal Name:</strong> {submittedData.legalName}</p>
+  //         <p><strong>License Number:</strong> {submittedData.licenseNumber}</p>
+  //         <p><strong>Phone Number:</strong> {submittedData.phoneNumber || 'N/A'}</p>
+  //         <p><strong>Website URL:</strong> {submittedData.websiteUrl || 'N/A'}</p>
+  //         <p><strong>Description:</strong> {submittedData.description || 'N/A'}</p>
+  //         <p><strong>Address:</strong> {`${submittedData.address.street1}${submittedData.address.street2 ? ', ' + submittedData.address.street2 : ''}, ${submittedData.address.city}, ${submittedData.address.state} ${submittedData.address.zipCode}`}</p>
+  //         <p><strong>Amenities:</strong> {submittedData.amenities.length ? submittedData.amenities.join(', ') : 'None'}</p>
+  //         <p><strong>Subscription Tier:</strong> {selectedTier?.displayName}</p>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="bg-gradient-to-br from-orange-50 to-white min-h-screen py-12 px-4 sm:px-6 lg:px-8 font-inter">
@@ -109,7 +124,7 @@ export default function DispensaryApplicationForm({ selectedTier }: DispensaryAp
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-10">
           {/* PERSONAL INFO */}
           <section>
-            <h2 className="text-2xl font-semibold mb-4 text-orange-500">Personal Info</h2>
+            <h2 className="text-2xl font-semibold mb-4 text-orange-500">Contact</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <FormField label="First Name*" error={errors.firstName?.message}>
                 <input {...register('firstName', { required: 'First name is required' })} className="input" />
@@ -140,13 +155,13 @@ export default function DispensaryApplicationForm({ selectedTier }: DispensaryAp
           {/* DISPENSARY INFO */}
           <section>
             <h2 className="text-2xl font-semibold mb-4 text-orange-500">Dispensary Info</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-1 gap-0">
               <FormField label="Dispensary Name*">
                 <input {...register('dispensaryName', { required: true })} className="input" />
               </FormField>
-              <FormField label="Legal Name*">
+              {/* <FormField label="Legal Name*">
                 <input {...register('legalName', { required: true })} className="input" />
-              </FormField>
+              </FormField> */}
               <FormField label="License Number*" className="sm:col-span-2">
                 <input {...register('licenseNumber', { required: true })} className="input" />
               </FormField>
@@ -174,29 +189,35 @@ export default function DispensaryApplicationForm({ selectedTier }: DispensaryAp
           {/* ADDRESS */}
           <section>
             <h2 className="text-2xl font-semibold mb-4 text-orange-500">Address</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <FormField label="Street 1*">
-                <input {...register('address.street1', { required: true })} className="input" />
-              </FormField>
-              <FormField label="Street 2">
-                <input {...register('address.street2')} className="input" />
-              </FormField>
-              <FormField label="City*">
-                <input {...register('address.city', { required: true })} className="input" />
-              </FormField>
-              <FormField label="State*">
-                <input {...register('address.state', { required: true })} className="input" />
-              </FormField>
-              <FormField label="Zip Code*" error={errors.address?.zipCode?.message} className="sm:col-span-2">
-                <input
-                  {...register('address.zipCode', {
-                    required: true,
-                    pattern: { value: /^\d{5}(-\d{4})?$/, message: 'Invalid zip code' },
-                  })}
-                  className="input"
+            <Controller
+              name="address"
+              control={control}
+              rules={{
+                required: true,
+                validate: (value) => {
+                  if (!value?.street1 || !value?.city || !value?.state || !value?.zipCode) {
+                    return 'All address fields are required';
+                  }
+                  const zipRegex = /^\d{5}(-\d{4})?$/;
+                  if (!zipRegex.test(value.zipCode)) {
+                    return 'Invalid zip code';
+                  }
+                  return true;
+                },
+              }}
+              render={({ field }) => (
+                <AddressAutocomplete
+                  value={field.value || { street1: '', street2: '', city: '', state: '', zipCode: '' }}
+                  onChange={field.onChange}
+                  required
                 />
-              </FormField>
-            </div>
+              )}
+            />
+            {errors.address && (
+              <p className="text-red-600 text-sm mt-1">
+                {errors.address.message || 'Address is required'}
+              </p>
+            )}
           </section>
 
           {/* AMENITIES */}
@@ -216,6 +237,30 @@ export default function DispensaryApplicationForm({ selectedTier }: DispensaryAp
               ))}
             </div>
           </section>
+
+          {/* AdditionalLocationsCount */}
+          <section> 
+            <h2 className="text-2xl font-semibold mb-4 text-orange-500">Additional Locations</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-1 gap-0">
+              <label className="block font-medium text-sm text-gray-800 mb-1">Additional Locations</label>
+              <input type="number" min={0} step={1} {...register('additionalLocationsCount', { required: true, min: 0 })} className="input" />
+            </div>  
+          </section>
+          
+
+          {/* AccessType(Medical or Recreational or Both) */}
+          <section>
+            <h2 className="text-2xl font-semibold mb-4 text-orange-500">Access Type</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-1 gap-0">
+              <label className="block font-medium text-sm text-gray-800 mb-1">Access Type</label>
+              <select {...register('accessType' as const)} className="input">
+                <option value="medical">Medical</option>
+                <option value="recreational">Recreational</option>
+                <option value="medical/recreational">Medical & Recreational</option>
+              </select>
+            </div>
+          </section>
+
 
           {errorMessage && (
             <div className="mb-6 p-4 text-red-700 bg-red-100 border border-red-300 rounded">

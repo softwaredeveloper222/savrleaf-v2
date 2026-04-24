@@ -10,9 +10,10 @@ interface Props {
   loading?: boolean;
   activeTab: 'deals' | 'dispensaries';
   setActiveTab: (tab: 'deals' | 'dispensaries') => void;
+  userLocation?: { lat: number; lng: number };
 }
 
-export default function DealsDispensariesTabs({ deals, dispensaries, loading = false, activeTab, setActiveTab }: Props) {
+export default function DealsDispensariesTabs({ deals, dispensaries, loading = false, activeTab, setActiveTab, userLocation }: Props) {
   const renderSkeletonCard = () => (
     <div className="animate-pulse bg-gray-100 rounded-xl h-40 w-full" />
   );
@@ -28,7 +29,7 @@ export default function DealsDispensariesTabs({ deals, dispensaries, loading = f
           }`}
           onClick={() => setActiveTab('deals')}
         >
-          Deals
+          Discounts
         </button>
         <button
           className={`px-6 py-2 rounded-full text-sm font-semibold transition cursor-pointer ${
@@ -52,11 +53,32 @@ export default function DealsDispensariesTabs({ deals, dispensaries, loading = f
             </div>
           ))
         ) : activeTab === 'deals' ? (
-          deals.length ? deals.map((deal) => <DealCard key={deal._id} deal={deal} />) : <p>No deals found.</p>
+          deals.length ? (
+            deals.map((deal, index) => {
+              // Handle Mongoose populated documents that may have _doc wrapper
+              const dealData = typeof deal === 'object' && '_doc' in deal 
+                ? (deal as { _doc: Deal })._doc 
+                : deal;
+              return (
+                <DealCard 
+                  key={dealData._id || `deal-${index}-${dealData.title || 'unknown'}`} 
+                  deal={dealData}
+                  userLocation={userLocation}
+                />
+              );
+            })
+          ) : (
+            <p key="no-deals" className="col-span-full text-center text-gray-500 py-8">No discounts found.</p>
+          )
         ) : dispensaries.length ? (
-          dispensaries.map((dispensary) => <DispensaryCard key={dispensary._id} dispensary={dispensary} />)
+          dispensaries.map((dispensary, index) => (
+            <DispensaryCard 
+              key={dispensary._id || `dispensary-${index}-${dispensary.name || 'unknown'}`} 
+              dispensary={dispensary} 
+            />
+          ))
         ) : (
-          <p>No dispensaries found.</p>
+          <p key="no-dispensaries" className="col-span-full text-center text-gray-500 py-8">No dispensaries found.</p>
         )}
       </div>
     </div>

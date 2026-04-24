@@ -63,7 +63,7 @@ const ContactPage = () => {
               Message Sent!
             </h2>
             <p className="text-gray-600 mb-6">
-              Thank you for contacting SavrLeaf™. We&apos;ll respond within 24–48 hours.
+              Thank you for contacting SavrLeaf<sup className="text-xs align-super">®</sup>. We&apos;ll respond within 24–48 hours.
             </p>
             <Link
               href="/"
@@ -85,7 +85,7 @@ const ContactPage = () => {
           {/* Page Header */}
           <header className="mb-10 text-center">
             <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-3">
-              Contact SavrLeaf™
+              Contact SavrLeaf<sup className="text-xs align-super">®</sup>
             </h1>
             <p className="text-base sm:text-lg text-gray-700 max-w-xl mx-auto">
               Have questions, need partner support, or want to report an issue?

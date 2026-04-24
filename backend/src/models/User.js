@@ -14,12 +14,32 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      required: true,
+      // required: true,
       minlength: 6,
+    },
+    isSubPartner: {
+      type: Boolean,
+      default: false,
     },
     isActive: {
       type: Boolean,
       default: true,
+    },
+    isActiveByLink: {
+      type: Boolean,
+      default: false,
+    },
+    firstLogin: {
+      type: Boolean,
+      default: false,
+    },
+    activationToken: {
+      type: String,
+      required: false,
+    },
+    expirationTime: {
+      type: Date,
+      required: false,
     },
     role: {
       type: String,
@@ -29,6 +49,18 @@ const userSchema = new mongoose.Schema(
     subscription: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Subscription',
+      required: false,
+    },
+    allowMultipleLocations: {
+      type: Boolean,
+      default: false,
+    },
+    resetPasswordToken: {
+      type: String,
+      required: false,
+    },
+    resetPasswordExpires: {
+      type: Date,
       required: false,
     },
     dispensaries: [

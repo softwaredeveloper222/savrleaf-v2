@@ -14,7 +14,7 @@ const PrivacyPage = () => {
               Privacy Policy
             </h1>
             <p className="mt-3 text-base sm:text-lg text-gray-700 max-w-2xl mx-auto">
-              Your privacy is important to us at SavrLeaf™. This page explains how
+              Your privacy is important to us at <sup className="text-xs align-super">®</sup>. This page explains how
               we handle your information.
             </p>
           </header>
@@ -24,17 +24,17 @@ const PrivacyPage = () => {
             {/* Highlight Banner */}
             <section className="bg-orange-50 border border-orange-200 rounded-lg p-6 mb-10 text-center">
               <h2 className="text-2xl font-bold text-orange-800 mb-4">
-                SavrLeaf™ Privacy Policy
+                SavrLeaf<sup className="text-xs align-super">®</sup> Privacy Policy
               </h2>
               <p className="text-base text-orange-700 font-medium leading-relaxed">
-                We respect your privacy. SavrLeaf™ collects only the minimal
+                We respect your privacy. SavrLeaf<sup className="text-xs align-super">®</sup> collects only the minimal
                 information necessary to provide our services. <br />
                 We never sell your data. For questions, contact{' '}
                 <a
-                  href="mailto:support@savrleaf.com"
+                  href="mailto:support@savrleafdeals.com"
                   className="underline text-orange-600 hover:text-orange-800 transition-colors"
                 >
-                  support@savrleaf.com
+                  support@savrleafdeals.com
                 </a>.
               </p>
             </section>
@@ -47,13 +47,13 @@ const PrivacyPage = () => {
                   content: (
                     <>
                       <p>
-                        SavrLeaf™ collects minimal information necessary to provide
+                        <sup className="text-xs align-super">®</sup> collects minimal information necessary to provide
                         our services:
                       </p>
                       <ul>
                         <li>Age verification data (21+ confirmation)</li>
-                        <li>Location data (to show nearby deals)</li>
-                        <li>Basic usage analytics (page views, deal interactions)</li>
+                        <li>Location data (to show nearby discounts)</li>
+                        <li>Basic usage analytics (page views, discount interactions)</li>
                         <li>
                           Partner account information (for dispensary partners only)
                         </li>
@@ -68,7 +68,7 @@ const PrivacyPage = () => {
                       <p>We use collected information solely to:</p>
                       <ul>
                         <li>Verify age requirements (21+)</li>
-                        <li>Show relevant deals in your area</li>
+                        <li>Show relevant discounts in your area</li>
                         <li>Improve our platform and user experience</li>
                         <li>Communicate with our business partners</li>
                       </ul>
@@ -85,7 +85,7 @@ const PrivacyPage = () => {
                       </p>
                       <ul>
                         <li>
-                          Partner dispensaries (when you interact with their deals)
+                          Partner dispensaries (when you interact with their discounts)
                         </li>
                         <li>Legal authorities (when required by law)</li>
                         <li>
@@ -128,10 +128,10 @@ const PrivacyPage = () => {
                     <p>
                       For privacy questions or data requests, contact us at:{' '}
                       <a
-                        href="mailto:support@savrleaf.com"
+                        href="mailto:support@savrleafdeals.com"
                         className="font-semibold underline text-orange-600 hover:text-orange-800 transition-colors"
                       >
-                        support@savrleaf.com
+                        support@savrleafdeals.com
                       </a>
                     </p>
                   ),

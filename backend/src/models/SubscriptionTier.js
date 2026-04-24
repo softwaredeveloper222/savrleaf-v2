@@ -16,7 +16,6 @@ const SubscriptionTierSchema = new Schema(
     tier: {
       type: Number,
       required: true,
-      unique: true,
     },
     baseSKULimit: {
       type: Number,

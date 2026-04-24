@@ -3,6 +3,11 @@ import bcrypt from 'bcryptjs';
 
 const applicationSchema = new mongoose.Schema(
   {
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+    },
     firstName: {
       type: String,
       required: true,
@@ -35,11 +40,6 @@ const applicationSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
-    legalName: {
-      type: String,
-      required: true,
-      trim: true,
-    },
     address: {
       street1: { type: String, required: true, trim: true },
       street2: { type: String, trim: true },
@@ -50,6 +50,17 @@ const applicationSchema = new mongoose.Schema(
         required: true,
         match: [/^\d{5}(-\d{4})?$/, 'Please enter a valid zip code'],
       },
+    },
+    additionalLocationsCount: {
+      type: Number,
+      required: true,
+      default: 0
+    },
+    accessType: {
+      type: String,
+      enum: ['medical', 'recreational', 'medical/recreational'],
+      required: true,
+      default: 'medical'
     },
     licenseNumber: {
       type: String,
@@ -87,6 +98,10 @@ const applicationSchema = new mongoose.Schema(
       type: String,
       required: false,
       trim: true,
+    },
+    isArchived: {
+      type: Boolean,
+      default: false,
     },
   },
   {

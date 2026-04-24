@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
@@ -12,7 +12,13 @@ export default function PartnerLogin() {
   const [password, setPassword] = useState<string>('');
   const [error, setError] = useState<string>('');
   const router = useRouter();
-  const { login } = useAuth();
+  const { login, isAuthenticated, user, loading } = useAuth();
+
+  useEffect(() => {
+    if (!loading && isAuthenticated && user?.role === 'partner') {
+      router.replace('/partner-dashboard');
+    }
+  }, [loading, isAuthenticated, user, router]);
 
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -25,7 +31,7 @@ export default function PartnerLogin() {
         password,
       });
 
-      const { token, user } = res.data;
+      const { token, user, firstLogin } = res.data;
 
       login(token, user);
       router.push('/partner-dashboard');
@@ -39,6 +45,18 @@ export default function PartnerLogin() {
       } else {
         setError('Login failed');
       }
+    }
+  };
+
+  const resendActivationLink = async () => {
+    if(email === '') {
+      setError('Please enter your email');
+      return;
+    }
+    try {
+      const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/resend-activation-link`, { email });
+    } catch (err: unknown) {
+      console.error('Resend activation link error:', err);
     }
   };
 
@@ -86,6 +104,24 @@ export default function PartnerLogin() {
           >
             Log In
           </button>
+
+          {/* Forgot Password and Resend activation link */}
+          <div className="flex items-center justify-between gap-4">
+            <button
+              type="button"
+              className="text-orange-700 font-medium hover:underline text-sm"
+              onClick={() => router.push('/forgot-password')}
+            >
+              Forgot Password?
+            </button>
+            <button
+              type="button"
+              className="text-orange-700 font-medium hover:underline text-sm"
+              onClick={() => resendActivationLink()}
+            >
+              Resend activation link
+            </button>
+          </div>
 
           <div className="text-center mt-2">
             <span className="text-sm text-gray-600">Not a partner yet? </span>

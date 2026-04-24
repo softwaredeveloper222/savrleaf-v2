@@ -1,4 +1,5 @@
 export const amenitiesOptions = [
+  'Accepts Credit Cards',
   'Parking',
   'Wi-Fi',
   'Wheelchair Accessible',

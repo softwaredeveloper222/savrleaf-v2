@@ -17,14 +17,14 @@ const subscriptionSchema = new mongoose.Schema(
     stripeSubscriptionId: {
       type: String,
       required: false,
-      unique: true,
+      // unique: true,
     },
 
-    stripeCustomerId: {
-      type: String,
-      required: false,
-      unique: true,
-    },
+    // stripeCustomerId: {
+    //   type: String,
+    //   required: false,
+    //   unique: true,
+    // },
 
     status: {
       type: String,
@@ -50,6 +50,11 @@ const subscriptionSchema = new mongoose.Schema(
       required: false,
     },
 
+    skuCount: {
+      type: Number,
+      default: 0,
+    },
+
     bonusSkus: {
       type: Number,
       default: 0,
@@ -63,6 +68,11 @@ const subscriptionSchema = new mongoose.Schema(
     metadata: {
       type: mongoose.Schema.Types.Mixed,
       default: {},
+    },
+
+    additionalLocationsCount: {
+      type: Number,
+      default: 0,
     },
   },
   {

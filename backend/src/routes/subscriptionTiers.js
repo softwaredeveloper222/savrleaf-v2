@@ -14,4 +14,16 @@ router.get('/', async (req, res) => {
   }
 });
 
+router.get('/tier-by-name/:name', async (req, res) => {
+  try {
+    const { name } = req.params;
+    const tier = await SubscriptionTier.findOne({ name });
+    if (!tier) return res.status(404).json({ error: 'Subscription tier not found' });
+    res.status(200).json(tier);
+  } catch (error) {
+    console.error('Error fetching subscription tier by name:', error);
+    res.status(500).json({ error: 'Failed to load subscription tier by name' });
+  }
+});
+
 export default router;

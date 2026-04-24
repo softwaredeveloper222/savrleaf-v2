@@ -21,16 +21,34 @@ export function calculateDistanceInMiles(
 
 export async function getCoordinatesForZip(zip: string): Promise<{ latitude: number; longitude: number } | null> {
   try {
-    const res = await fetch(`https://api.zippopotam.us/us/${zip}`);
+    const mapboxToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
+    if (!mapboxToken) {
+      console.error('NEXT_PUBLIC_MAPBOX_API_KEY is not defined in environment');
+      return null;
+    }
+
+    // Query Mapbox Geocoding API with zip code
+    // Adding ", USA" helps ensure we get US zip codes
+    const query = encodeURIComponent(`${zip}, USA`);
+    const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${query}.json?access_token=${mapboxToken}&country=us&types=postcode`;
+
+    const res = await fetch(url);
     if (!res.ok) return null;
+
     const data = await res.json();
-    const place = data.places?.[0];
-    if (!place) return null;
+    const feature = data.features?.[0];
+
+    if (!feature || !feature.geometry?.coordinates) return null;
+
+    // Mapbox returns coordinates as [longitude, latitude]
+    const [longitude, latitude] = feature.geometry.coordinates;
+
     return {
-      latitude: parseFloat(place.latitude),
-      longitude: parseFloat(place.longitude),
+      latitude,
+      longitude,
     };
-  } catch {
+  } catch (error) {
+    console.error('Error fetching coordinates from Mapbox:', error);
     return null;
   }
 }

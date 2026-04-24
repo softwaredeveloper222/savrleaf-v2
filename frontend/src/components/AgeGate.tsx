@@ -2,9 +2,11 @@
 
 import { useAgeGate } from '@/context/AgeGateContext';
 import Image from 'next/image';
+import { useState } from 'react';
 
 export default function AgeGateOverlay() {
   const { is21, setIs21 } = useAgeGate();
+  const [isProcessing, setIsProcessing] = useState(false);
 
   if (is21 === true) return null;
   if (is21 === false) {
@@ -17,6 +19,18 @@ export default function AgeGateOverlay() {
       </div>
     );
   }
+
+  const handleYes = () => {
+    setIsProcessing(true);
+    // Delay so age gate does not advance too quickly (1 second)
+    setTimeout(() => {
+      setIs21(true);
+    }, 1000);
+  };
+
+  const handleNo = () => {
+    setIs21(false);
+  };
 
   return (
     <div className="fixed inset-0 z-50">
@@ -32,24 +46,22 @@ export default function AgeGateOverlay() {
           height={120}
           className="mb-6"
         />
-        <h2 className="text-4xl font-extrabold mb-4 drop-shadow-md">
-          Are You 21 or Older?
+        <h2 className="text-4xl font-extrabold mb-8 drop-shadow-md">
+          Are you 21+ and ready for discounts?
         </h2>
-        <p className="text-lg max-w-md mb-8 drop-shadow-sm">
-          We need to verify your age before you can explore our deals.
-        </p>
         <div className="flex space-x-6">
           <button
-            className="px-6 py-3 bg-orange-500 hover:bg-orange-400 text-white text-lg font-semibold rounded-xl shadow-lg transition cursor-pointer"
-            onClick={() => setIs21(true)}
+            className="px-8 py-4 bg-orange-500 hover:bg-orange-400 text-white text-lg font-semibold rounded-xl shadow-lg transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            onClick={handleYes}
+            disabled={isProcessing}
           >
-            Yes, I am
+            Yes — Show me discounts
           </button>
           <button
-            className="px-6 py-3 bg-gray-600 hover:bg-gray-500 text-white text-lg font-semibold rounded-xl shadow-lg transition cursor-pointer"
-            onClick={() => setIs21(false)}
+            className="px-8 py-4 bg-gray-600 hover:bg-gray-500 text-white text-lg font-semibold rounded-xl shadow-lg transition cursor-pointer"
+            onClick={handleNo}
           >
-            No
+            No — Exit
           </button>
         </div>
       </div>

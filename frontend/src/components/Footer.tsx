@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import logo from '../assets/logo.png';
 
 export default function Footer() {
@@ -14,7 +15,7 @@ export default function Footer() {
                 Must Be 21+ • Legal Disclaimer
               </p>
               <p>
-                <strong className="text-yellow-50">SavrLeaf™ does not sell or handle cannabis products.</strong> We connect consumers with licensed dispensaries. All purchases are made through licensed third-party retailers. Please consume responsibly and follow local laws.
+                <strong className="text-yellow-50">SavrLeaf<sup className="text-[10px] relative -top-[0.7em]">®</sup> does not sell or handle cannabis products.</strong> We connect consumers with licensed dispensaries. All purchases are made through licensed third-party retailers. Please consume responsibly and follow local laws.
               </p>
             </div>
           </div>
@@ -25,16 +26,17 @@ export default function Footer() {
           {/* Brand */}
           <div className="md:col-span-2">
             <div className="flex items-center space-x-3 mb-4">
-              <img
-                src={logo.src}
+              <Image
+                src={logo}
                 alt="SavrLeaf Logo"
+                width={36}
+                height={36}
                 className="w-9 h-9 rounded-lg object-cover"
-                loading="lazy"
               />
-              <h2 className="text-2xl font-bold text-white">SavrLeaf™</h2>
+              <h2 className="text-2xl font-bold text-white">SavrLeaf<sup className="text-xs align-super">®</sup></h2>
             </div>
             <p className="text-gray-300 mb-4 max-w-md">
-              Find the best verified cannabis deals from trusted dispensaries near you. Explore new products and compare prices with confidence.
+              Find the best verified cannabis discounts from trusted dispensaries near you. Explore new products and compare prices with confidence.
             </p>
             <div className="text-sm text-green-200 space-y-1">
               <p>Verified dispensaries only</p>
@@ -51,6 +53,8 @@ export default function Footer() {
                 ['Terms of Service', '/terms'],
                 ['Privacy Policy', '/privacy'],
                 ['Contact Us', '/contact'],
+                ['About', '/about'],
+                ['How It Works', '/how-it-works'],
               ].map(([label, path]) => (
                 <li key={path}>
                   <Link className="text-gray-300 hover:text-green-400 transition" href={path}>
@@ -69,7 +73,7 @@ export default function Footer() {
                 ['Become a Partner', '/partner-signup'],
                 ['Partner Login', '/partner-login'],
                 ['Admin Login', '/admin-login'],
-                ['Pricing Plans', '/partner-signup'],
+                // ['Pricing Plans', '/partner-signup'],
                 ].map(([label, path], index) => (
                   <li key={`${path}-${index}`}>
                     <Link href={path} className="text-gray-300 hover:text-green-400 transition">
@@ -81,12 +85,27 @@ export default function Footer() {
           </div>
         </div>
 
+        {/* Partner CTA */}
+        <div className="border-t border-green-800 pt-8 pb-6">
+          <div className="bg-gradient-to-r from-orange-600 to-orange-700 rounded-xl p-6 text-center">
+            <p className="text-white text-lg font-semibold mb-4">
+              Are you a dispensary? List your discounted items on SavrLeaf.
+            </p>
+            <Link
+              href="/partner-signup"
+              className="inline-block bg-white text-orange-600 px-6 py-3 rounded-lg font-bold hover:bg-orange-50 transition-colors"
+            >
+              Partner Application / Apply Here
+            </Link>
+          </div>
+        </div>
+
         {/* Footer Bottom Bar */}
         <div className="border-t border-green-800 pt-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 text-sm text-gray-400">
           <div>
-            <p>© 2025 SavrLeaf™. All rights reserved.</p>
+            <p>© 2025 SavrLeaf<sup className="text-[10px] relative -top-[0.7em]">®</sup>. All rights reserved.</p>
             <p className="text-xs mt-1">
-              SavrLeaf™ is a registered trademark of LumoraSolutionsLLC. Product names and logos are property of their respective owners.
+              SavrLeaf<sup className="text-[9px] relative -top-[0.6em]">®</sup> is a registered trademark of LumoraSolutionsLLC. Product names and logos are property of their respective owners.
             </p>
           </div>
           <div className="text-xs text-gray-500 max-w-md text-left md:text-right">

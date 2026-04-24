@@ -1,32 +1,50 @@
 import mongoose from 'mongoose';
 import slugify from 'slugify';
+import { ensureDealHasImage } from '../utils/defaultCategoryImages.js';
 
 const dealSchema = new mongoose.Schema(
   {
-    title: { type: String, required: true },
+    title: { type: String },
     brand: { type: String },
-    tags: [String],
+    tags: {
+      type: [String],
+      validate: {
+        validator: function (arr) {
+          if (!arr) return true;
+          const allowed = ['Clearance', 'Manager Special', 'Overstock', 'Last-Chance', 'Weekend Drop', 'Daily Deal'];
+          return arr.length <= 2 && arr.every(t => allowed.includes(t));
+        },
+        message: 'Tags must be from the allowed set (max 2): Clearance, Manager Special, Overstock, Last-Chance, Weekend Drop, Daily Deal',
+      },
+    },
     description: { type: String },
-    originalPrice: { type: Number, required: true },
+    originalPrice: { type: Number },
     salePrice: {
       type: Number,
       required: true,
     },
     images: [{ type: String }],
     dispensary: { type: mongoose.Schema.Types.ObjectId, ref: 'Dispensary', required: true },
+    deal_purchase_link: { type: String},
     category: {
       type: String,
-      required: true,
-      enum: ['flower', 'edibles', 'concentrates', 'vapes', 'topicals', 'accessories', 'other'],
+      enum: ['flower', 'edibles', 'concentrates', 'vapes', 'topicals', 'other', 'pre-roll', 'tincture', 'beverage', 'capsule/pill'],
       lowercase: true
     },
     subcategory: {
       type: String,
-      trim: true
+      trim: true,
+      // For Flower category, subcategories can be: 'ground-flower', 'baby-buds-popcorn', or custom
+    },
+    descriptiveKeywords: {
+      type: [String],
+      default: [],
+      // Keywords like: 'relaxing', 'focused', 'uplifting', 'calming', 'energizing', 'creative', 'sleepy', 'euphoric', etc.
     },
     strain: {
       type: String,
-      trim: true
+      enum: ["indica", "indica-dominant hybrid", "hybrid", "sativa-dominant hybrid", "sativa"],
+      lowercase: true
     },
     thcContent: {
       type: Number,
@@ -40,10 +58,9 @@ const dealSchema = new mongoose.Schema(
     },
     startDate: {
       type: Date,
-      required: true,
       validate: {
         validator: function (value) {
-          if (!value) return false;
+          if (!value) return true;
 
           const inputDate = new Date(value);
           const today = new Date();
@@ -60,14 +77,28 @@ const dealSchema = new mongoose.Schema(
         message: 'Start date must be today or in the future',
       },
     },
-    endDate: { type: Date, required: true },
-    accessType: {
-      type: String,
-      enum: ['medical', 'recreational', 'both'],
-      default: 'both',
-    },
-    slug: { type: String, unique: true },
+    endDate: { type: Date },
+    slug: { type: String },
     manuallyActivated: { type: Boolean, default: false },
+    isActive: { type: Boolean, default: false },
+    isPurchased: { type: Boolean, default: false },
+    discountTier: {
+      type: Number,
+      min: 10,
+      max: 50,
+      validate: {
+        validator: function (value) {
+          if (value === undefined || value === null) return true;
+          return value % 10 === 0;
+        },
+        message: 'Discount tier must be in 10% increments between 10 and 50',
+      },
+    },
+    sizeOrStrength: {
+      type: String,
+      trim: true,
+      // Product size or strength, e.g. 3.5g, 100mg, 0.5g x 10 pack, 30ml
+    },
   },
   { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
@@ -77,14 +108,46 @@ dealSchema.virtual('savings').get(function () {
   return this.originalPrice - this.salePrice;
 });
 
+dealSchema.virtual('discountPercent').get(function () {
+  if (typeof this.discountTier === 'number') {
+    return this.discountTier;
+  }
+  if (this.originalPrice && this.salePrice && this.originalPrice > 0) {
+    const pct = (1 - this.salePrice / this.originalPrice) * 100;
+    return Math.round(pct);
+  }
+  return null;
+});
+
+dealSchema.virtual('estimatedOriginalPrice').get(function () {
+  if (this.originalPrice) return this.originalPrice;
+  if (this.salePrice && typeof this.discountTier === 'number') {
+    const fraction = 1 - this.discountTier / 100;
+    if (fraction <= 0) return null;
+    const est = this.salePrice / fraction;
+    return Math.round(est * 100) / 100;
+  }
+  return null;
+});
+
+dealSchema.virtual('estimatedSavings').get(function () {
+  const original = this.estimatedOriginalPrice ?? this.originalPrice;
+  if (original && this.salePrice) {
+    const savings = original - this.salePrice;
+    return Math.round(savings * 100) / 100;
+  }
+  return null;
+});
+
 dealSchema.virtual('isExpired').get(function () {
+  if (!this.endDate) return false;
   return new Date() > this.endDate;
 });
 
 dealSchema.virtual('isCurrentlyActive').get(function () {
   const now = new Date();
   return (
-    (this.manuallyActivated || (now >= this.startDate && now <= this.endDate)) &&
+    (this.manuallyActivated || (this.startDate && this.endDate && now >= this.startDate && now <= this.endDate)) &&
     !this.isExpired
   );
 });
@@ -123,9 +186,18 @@ dealSchema.pre('save', function (next) {
   next();
 });
 
+// Ensure deal has at least one image (use default category image if none provided)
+dealSchema.pre('save', function (next) {
+  // Only apply if images are being set/modified and category exists
+  if (this.category && (!this.images || this.images.length === 0 || !this.images[0])) {
+    this.images = ensureDealHasImage(this.images, this.category);
+  }
+  next();
+});
+
 // Custom validation: startDate must be before endDate
 dealSchema.pre('validate', function (next) {
-  if (this.startDate >= this.endDate) {
+  if (this.startDate && this.endDate && this.startDate >= this.endDate) {
     this.invalidate('startDate', 'Start date must be before end date');
   }
   next();
@@ -133,7 +205,7 @@ dealSchema.pre('validate', function (next) {
 
 // Custom validation: salePrice must be <= originalPrice
 dealSchema.pre('validate', function (next) {
-  if (this.salePrice > this.originalPrice) {
+  if (this.salePrice && this.originalPrice && this.salePrice > this.originalPrice) {
     this.invalidate('salePrice', 'Sale price must be less than or equal to original price');
   }
   next();

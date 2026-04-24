@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import { getCoordinatesFromAddress } from '../utils/geocode.js';
+import { ensureDispensaryHasImages, ensureDispensaryHasLogo } from '../utils/defaultCategoryImages.js';
 
 const { Schema, model } = mongoose;
 
@@ -9,8 +10,9 @@ const DispensarySchema = new Schema(
       type: String,
       required: true,
     },
-    legalName: {
-      type: String,
+    application: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Application',
       required: true,
     },
     address: {
@@ -24,6 +26,14 @@ const DispensarySchema = new Schema(
         match: [/^\d{5}(-\d{4})?$/, 'Please enter a valid zip code'],
       },
     },
+    subPartnerEmail: {
+      type: String,
+      required: false,
+    },
+    subPartnerPassword: {
+      type: String,
+      required: false,
+    },
     coordinates: {
       type: {
         type: String,
@@ -34,6 +44,12 @@ const DispensarySchema = new Schema(
         type: [Number], // [longitude, latitude]
         default: [0, 0],
       },
+    },
+    type: {
+      type: String,
+      enum: ['main', 'additional'],
+      default: 'main',
+      required: true,
     },
     licenseNumber: {
       type: String,
@@ -50,6 +66,13 @@ const DispensarySchema = new Schema(
       type: Map,
       of: String,
     },
+    weeklyPromotions: {
+      type: Map,
+      of: String,
+    },
+    accessoriesMerch: {
+      type: String,
+    },
     description: {
       type: String,
     },
@@ -62,7 +85,7 @@ const DispensarySchema = new Schema(
     },
     images: {
       type: [String],
-      default: [],
+      default: ['https://res.cloudinary.com/da6h7gmay/image/upload/v1766964475/others_gvdmgl.png'],
     },
     status: {
       type: String,
@@ -72,7 +95,7 @@ const DispensarySchema = new Schema(
     application: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Application',
-      required: true,
+      // required: true,
     },
     user: {
       type: mongoose.Schema.Types.ObjectId,
@@ -86,9 +109,49 @@ const DispensarySchema = new Schema(
       type: [Number],
       default: [],
     },
+    skuLimit: {
+      type: Number,
+      default: 0,
+    },
+    additionalSkuLimit: {
+      type: Number,
+      default: 0,
+    },
+    usedSkus: {
+      type: Number,
+      default: 0,
+    },
+    isActive: {
+      type: Boolean,
+      default: false,
+    },
+    isPurchased: {
+      type: Boolean,
+      default: false,
+    },
+    subscription: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Subscription',
+    },
+    extraLimit: {
+      type: Number,
+      default: 10,
+    },
+    accessType: {
+      type: String,
+      enum: ['medical', 'recreational', 'medical/recreational'],
+      default: 'medical',
+    },
+    isArchived: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );
+
+// Create geospatial index for location-based queries
+DispensarySchema.index({ coordinates: '2dsphere' });
 
 DispensarySchema.pre('save', async function (next) {
   if (this.isModified('address')) {
